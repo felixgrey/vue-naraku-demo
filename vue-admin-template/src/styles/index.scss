@@ -59,7 +59,63 @@ div:focus {
   }
 }
 
+// fixed-bug
+#app {
+    
+  .el-pagination {
+    .el-select {
+      .el-input {
+        .el-input__inner{
+          height: 20px;
+          width: 68px;
+        }
+      }
+    }
+  }   
+    
+  .el-select{
+    margin-bottom: 18px;
+    
+    .el-input__icon{
+      line-height: 20px;
+    }
+    
+    .el-input__inner{
+      margin-bottom: 0;
+    }
+  } 
+}
+
+
 // main-container global css
 .app-container {
-  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.row-margin-top {
+  margin-top:  24px;
+}
+.row-margin-bottom {
+  margin-bottom: 24px;
+}
+
+.row-margin-left {
+  margin-legt: 24px;
+}
+
+.row-margin-right {
+  margin-right: 24px;
+}
+
+.row-margin {
+  margin: 24px;
+}
+
+.row-outer {
+  overflow-x: hidden;
+  
+  &.row-gutter{
+      margin-left: 24px;
+      margin-right: 24px;
+  }
 }

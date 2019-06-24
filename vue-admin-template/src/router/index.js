@@ -1,10 +1,11 @@
 import Vue from 'vue'
-import Router from 'vue-router'
+import Router from 'vue-router';
 
 Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import Blank from '@/layout/Blank.vue'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -52,6 +53,26 @@ export const constantRoutes = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
+    }]
+  },
+  
+  {
+    path: '/naraku',
+    component: Layout,
+    name: 'naraku示例',
+    meta: { title: 'naraku示例', icon: 'table' },
+    children: [{
+      path: 'datahub',
+      name: 'DataHub',
+      component: Blank,
+      meta: { title: 'DataHub', icon: 'tree' },
+      children: [
+        {
+          path: 'cascade',
+          component: () => import('@/views/naraku/datahub/cascade.vue'),
+          meta: { title: '数据管理', icon: 'tree' }
+        },
+      ]
     }]
   },
 
