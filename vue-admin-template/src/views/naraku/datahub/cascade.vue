@@ -14,10 +14,6 @@
                     在本项目中，请求接口在/vue-naraku-demo/vue-admin-template/src/api/naraku.js做统一管理。
                     一般情况下，通过自动生成的接口文件即可满足需求，无需额外配置。
           </p>
-          
-         <p>
-           在本项目中，/vue-naraku-demo/nodeServer是一个很简单的node服务器，控制台下进入目录，输入node server即可启动(需先进行 npm install)。
-         </p>
          <p>
            具体应用案例参考本页代码 /vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/cascade.vue
          </p>
@@ -87,13 +83,35 @@
     <div class="row-margin-top">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <span>4. 分页</span>
+          <span>4. 分页和过滤</span>
         </div>
         <div >
           <p>
-            DataHub内置分页管理，只需声明pagination = true，并设置初始的分页信息即可。
+            DataHub内置分页管理，只需声明pagination = true，并设置初始的分页信息即可。<br/>
+            过滤和依赖的声明类似，最终都会以查询参数的形式提交到服务端。<br/>
+            根本区别在于依赖是强制的，当依赖条件不满足时，数据集清空，过滤是可选的，为空时不做过滤，正常查询。   <br/>
+            本例当触发change事件时直接执行了set方法，所以立即执行请求，也可以将过滤条件保存在本地，当点击查询按钮时执行set。
           </p>
-           <el-table
+          <div>性别
+            <el-select  
+              v-loading="dh.loading('sexList')"
+              v-model="selectedSex"  
+              @change="(sex) => dh.set('selectedSex', {sex})" placeholder="请选择">
+              <el-option
+                v-for="item in dh.get('sexList')"
+                :key="item.value"
+                :label="item.name"
+                :value="item.value">
+              </el-option>
+            </el-select>
+            年龄
+            <span>
+              <el-input 
+                @change="(age) => dh.set('selectedAge', {age})"
+                v-model="selectedAge" placeholder="请输入年龄"></el-input>
+            </span>
+          </div>
+          <el-table
             size="mini"
             :data="dh.get('pagiList')"
             style="width: 100%">
@@ -121,6 +139,20 @@
         </div>
       </el-card>
     </div>
+    <div class="row-margin-top">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span>5. 全局联动</span>
+        </div>
+        <div >
+          <p>
+                       我们在头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.<br/>
+                        这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。
+         </p>
+          头部选中值：{{gDh.first('selectedProvince')}}                   
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -138,9 +170,11 @@
       action: 'getCity',
       dependence: 'selectedProvince' // 依赖选中的省，可以用数据表示多重依赖
     },
-    // 分页数据
+    // 带分页的数据
     pagiList:{
       action: 'getPagiData',
+      // 检索用的过滤条件，支持多个过滤条件，依赖也一样可用多个。
+      filter: ['selectedSex', 'selectedAge'], 
       pagination: true, // 设置为分页数据，会自动创建分页数据集，名称为XXXPagination
     },
     // 自动创建的分页数据集
@@ -150,6 +184,23 @@
         page: 1, // 默认第一页
         limit: 5 // 默认每页条数
       }
+    },
+    // 性别列表，作为静态数据
+    sexList:{
+      default: [
+        {
+          value: 0,
+          name: '女'
+        },
+        {
+          value: 1,
+          name: '男'
+        },
+        {
+          value: null,
+          name: '不限'
+        }
+      ]
     }
   })({
     props: {
@@ -158,7 +209,9 @@
      return {
        selectedProvince: null,
        selectedCity: null,
-       currentPage: 1
+       selectedSex: null,
+       selectedAge: 100,
+       currentPage: 1,
      };
     },
     created() {

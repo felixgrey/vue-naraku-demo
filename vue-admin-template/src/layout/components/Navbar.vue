@@ -1,9 +1,20 @@
 <template>
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
     <breadcrumb class="breadcrumb-container" />
-
+    <span style="display: inline-block;margin: 10px;" >
+      <el-select  
+        v-loading="dh.loading('province')"
+        v-model="selectedProvince"  
+        @change="(value) => gDh.set('selectedProvince', {value})" placeholder="请选择">
+        <el-option
+          v-for="item in dh.get('province')"
+          :key="item.value"
+          :label="item.name"
+          :value="item.value">
+        </el-option>
+      </el-select>
+    </span>
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
@@ -32,11 +43,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+  
+import {DataHub} from 'naraku';
+import { mapGetters } from 'vuex';
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 
-export default {
+export default
+DataHub.inject({
+  // 获取省份列表
+  province: { // 数据集名称 province
+    action: 'getProvince'
+  },
+})({
   components: {
     Breadcrumb,
     Hamburger
@@ -47,6 +66,14 @@ export default {
       'avatar'
     ])
   },
+  data(){
+    return {
+      selectedProvince: null
+    }
+  },
+  created(){
+    console.log(this)
+  },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
@@ -56,7 +83,8 @@ export default {
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }
-}
+});
+ 
 </script>
 
 <style lang="scss" scoped>

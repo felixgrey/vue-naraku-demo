@@ -13,14 +13,25 @@ for(let i=0; i< 26849 ;i++) {
 exports.getPagiData = function(param = {}){
   const {
     limit,
-    page
+    page,
+    sex,
+    age,
   } = param;
+  
+  let filterData = exampleData;
+  
+  if(sex !== undefined) {
+    filterData = filterData.filter(item => item.sex == sex);
+  }
+  if(age !== undefined) {
+    filterData = filterData.filter(item => item.age == age);
+  }
   
   if(limit && page) {
     return {
-      total: exampleData.length,
-      data: [].concat(exampleData).splice((page -1 ) * limit, limit)};
+      total: filterData.length,
+      data: [].concat(filterData).splice((page -1 ) * limit, limit)};
   }
   
-  return exampleData;
+  return filterData;
 }
