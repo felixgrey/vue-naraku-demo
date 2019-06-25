@@ -131,16 +131,16 @@
   export default DataHub.inject({
     // 获取省份列表
     province: { // 数据集名称 province
-      type:'getProvince'
+      action: 'getProvince'
     },
     // 根据选中的省份，获取城市列表
     city: {
-      type:'getCity',
+      action: 'getCity',
       dependence: 'selectedProvince' // 依赖选中的省，可以用数据表示多重依赖
     },
     // 分页数据
     pagiList:{
-      type:'getPagiData',
+      action: 'getPagiData',
       pagination: true, // 设置为分页数据，会自动创建分页数据集，名称为XXXPagination
     },
     // 自动创建的分页数据集
