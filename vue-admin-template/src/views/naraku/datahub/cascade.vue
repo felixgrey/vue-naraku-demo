@@ -49,18 +49,16 @@
           <span>3. 省市区数据联动示例</span>
         </div>
         <div >
-          <p>
-            DataHub最常见用法就是数据联动，这里以省市数据联动为例，当选择A、B、C省时，可以明显看到loading效果。<br/>
-                              通过DataHub组件，可以方便的实现任意组件任意层级之间的联动，只需简单的添加几行声明语句即可。<br/>
-                              当选中的省份清空时，由于不满足依赖条件，城市列表也清空。<br/>
-                              在很多情况下，不使用v-model指令，而是使用:value直接绑定到DataHub数据集更方便。
-          </p>
+          <p>DataHub最常见用法就是数据联动，这里以省市数据联动为例，当选择A、B、C省时，可以明显看到loading效果。</p>
+          <p>通过DataHub组件，可以方便的实现任意组件任意层级之间的联动，只需简单的添加几行声明语句即可。</p>
+          <p> 当选中的省份清空时，由于不满足依赖条件，城市列表也清空。</p>
+          <p> 在很多情况下，不使用v-model指令，而是使用:value直接绑定到DataHub数据集更方便。</p>
           <div>
             <el-select  
               clearable
               v-loading="dh.loading('province')"
               :value="dh.first('selectedProvince').value"  
-              @change="(value) => {value ? dh.set('selectedProvince', {value}) : dh.set('selectedProvince',[]) }" 
+              @change="value => {value ? dh.set('selectedProvince', {value}) : dh.set('selectedProvince',[]) }" 
               placeholder="请选择">
               <el-option
                 v-for="item in dh.get('province')"
@@ -72,7 +70,7 @@
             <el-select 
               v-loading="dh.loading('city')"
               :value="dh.first('selectedCity').value"  
-              @change="(value) => dh.set('selectedCity', {value})" placeholder="请选择">
+              @change="value => dh.set('selectedCity', {value})" placeholder="请选择">
               <el-option
                 v-for="item in dh.get('city')"
                 :key="item.value"
@@ -90,17 +88,16 @@
           <span>4. 分页和过滤</span>
         </div>
         <div >
-          <p>
-            DataHub内置分页管理，只需声明pagination = true，并设置初始的分页信息即可。<br/>
-            过滤和依赖的声明类似，最终都会以查询参数的形式提交到服务端。<br/>
-            根本区别在于依赖是强制的，当依赖条件不满足时，数据集清空，过滤是可选的，为空时不做过滤，正常查询。   <br/>
-            本例当触发change事件时直接执行了set方法，所以立即执行请求，也可以将过滤条件保存在本地，当点击查询按钮时执行set。
-          </p>
+          <p>DataHub内置分页管理，只需声明pagination = true，并设置初始的分页信息即可。</p>
+          <p>过滤和依赖的声明类似，最终都会以查询参数的形式提交到服务端。</p>
+          <p> 根本区别在于依赖是强制的，当依赖条件不满足时，数据集清空，过滤是可选的，为空时不做过滤，正常查询。   </p>
+          <p> 过滤条件通过可以通过dataHub.assign0方法快速和已有数据的第一条merge。</p>
+          <p> 本例当触发change事件时直接执行了set方法，所以立即执行请求，也可以将过滤条件保存在本地，当点击查询按钮时执行set。</p>
           <div>性别
             <el-select  
               v-loading="dh.loading('sexList')"
               :value="dh.first('selectedSex').sex"  
-              @change="(sex) => dh.set('selectedSex', {sex})" placeholder="请选择">
+              @change="sex => dh.set('selectedSex', {sex})" placeholder="请选择">
               <el-option
                 v-for="item in dh.get('sexList')"
                 :key="item.value"
@@ -111,7 +108,7 @@
             年龄
             <span>
               <el-input 
-                @change="(age) => dh.set('selectedAge', {age})"
+                @change="age => dh.set('selectedAge', {age})"
                 :value="dh.first('selectedAge').age"
                 placeholder="请输入年龄"></el-input>
             </span>
@@ -132,12 +129,12 @@
           <div class="row-margin-top" style="height: 40px;">
             <el-pagination
               style="float: right;"
-              @size-change="(limit) => dh.assign0('pagiListPagination', {limit})"
-              @current-change="(page) => dh.assign0('pagiListPagination',{page})"
+              layout="total, sizes, prev, pager, next, jumper"             
+              @size-change="limit => dh.assign0('pagiListPagination', {limit})"
+              @current-change="page => dh.assign0('pagiListPagination',{page})"
               :current-page="dh.first('pagiListPagination').page"
               :page-sizes="[5, 10, 20, 50]"
               :page-size="dh.first('pagiListPagination').limit"
-              layout="total, sizes, prev, pager, next, jumper"
               :total="dh.first('pagiListPagination').total">
             </el-pagination>
           </div>
@@ -150,11 +147,9 @@
           <span>5. 全局联动</span>
         </div>
         <div >
-          <p>
-                         我们在头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.<br/>
-                         这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。<br/>
-                         在很多场景下，用DataHub可以代替Vuex、Redux管理全局状态。             
-         </p>
+          <p>我们在头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.</p>
+          <p> 这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。</p>
+          <p>在很多场景下，用DataHub可以代替Vuex、Redux管理全局状态。</p>             
           头部选中值：{{gDh.first('selectedProvince')}}                   
         </div>
       </el-card>
