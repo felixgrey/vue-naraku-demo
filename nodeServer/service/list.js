@@ -10,6 +10,7 @@ for(let i=0; i< 26849 ;i++) {
   })
 }
 
+// 可分页的数据
 exports.getPagiData = function(param = {}){
   const {
     limit,
@@ -23,6 +24,7 @@ exports.getPagiData = function(param = {}){
   if(sex !== undefined) {
     filterData = filterData.filter(item => item.sex == sex);
   }
+  
   if(age !== undefined) {
     filterData = filterData.filter(item => item.age == age);
   }

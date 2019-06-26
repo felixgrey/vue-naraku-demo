@@ -52,13 +52,16 @@
           <p>
             DataHub最常见用法就是数据联动，这里以省市数据联动为例，当选择A、B、C省时，可以明显看到loading效果。<br/>
                               通过DataHub组件，可以方便的实现任意组件任意层级之间的联动，只需简单的添加几行声明语句即可。<br/>
+                              当选中的省份清空时，由于不满足依赖条件，城市列表也清空。<br/>
                               在很多情况下，不使用v-model指令，而是使用:value直接绑定到DataHub数据集更方便。
           </p>
           <div>
             <el-select  
+              clearable
               v-loading="dh.loading('province')"
               :value="dh.first('selectedProvince').value"  
-              @change="(value) => dh.set('selectedProvince', {value})" placeholder="请选择">
+              @change="(value) => {value ? dh.set('selectedProvince', {value}) : dh.set('selectedProvince',[]) }" 
+              placeholder="请选择">
               <el-option
                 v-for="item in dh.get('province')"
                 :key="item.value"

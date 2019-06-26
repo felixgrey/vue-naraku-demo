@@ -59,10 +59,10 @@
   export default @DataHub.inject({
     
   })
-  class A extends blank {
+  class A extends blank { // 一定要继承blank
     
     // 定义一个vue属性，把配置信息写在这
-    vue={
+    vue = {
       data(){
         return {
           listenWhen: true,
