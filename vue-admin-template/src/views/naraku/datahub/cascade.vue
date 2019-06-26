@@ -1,6 +1,6 @@
 <template>
   <div class="app-container page">
-    <div class="row-margin-top">
+    <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>1. 请求接口</span>
@@ -21,7 +21,7 @@
         </div>
       </el-card>
     </div>
-    <div class="row-margin-top">
+    <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>2. 创建实例</span>
@@ -43,7 +43,7 @@
         </div>
       </el-card>
     </div>
-    <div class="row-margin-top">
+    <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>3. 省市区数据联动示例</span>
@@ -51,12 +51,13 @@
         <div >
           <p>
             DataHub最常见用法就是数据联动，这里以省市数据联动为例，当选择A、B、C省时，可以明显看到loading效果。<br/>
-                              通过DataHub组件，可以方便的实现任意组件任意层级之间的联动，只需简单的添加几行声明语句即可。
+                              通过DataHub组件，可以方便的实现任意组件任意层级之间的联动，只需简单的添加几行声明语句即可。<br/>
+                              在很多情况下，不使用v-model指令，而是使用:value直接绑定到DataHub数据集更方便。
           </p>
           <div>
             <el-select  
               v-loading="dh.loading('province')"
-              v-model="selectedProvince"  
+              :value="dh.first('selectedProvince').value"  
               @change="(value) => dh.set('selectedProvince', {value})" placeholder="请选择">
               <el-option
                 v-for="item in dh.get('province')"
@@ -67,7 +68,7 @@
             </el-select>
             <el-select 
               v-loading="dh.loading('city')"
-              v-model="selectedCity" 
+              :value="dh.first('selectedCity').value"  
               @change="(value) => dh.set('selectedCity', {value})" placeholder="请选择">
               <el-option
                 v-for="item in dh.get('city')"
@@ -80,7 +81,7 @@
         </div>
       </el-card>
     </div>
-    <div class="row-margin-top">
+    <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>4. 分页和过滤</span>
@@ -95,7 +96,7 @@
           <div>性别
             <el-select  
               v-loading="dh.loading('sexList')"
-              v-model="selectedSex"  
+              :value="dh.first('selectedSex').sex"  
               @change="(sex) => dh.set('selectedSex', {sex})" placeholder="请选择">
               <el-option
                 v-for="item in dh.get('sexList')"
@@ -108,7 +109,8 @@
             <span>
               <el-input 
                 @change="(age) => dh.set('selectedAge', {age})"
-                v-model="selectedAge" placeholder="请输入年龄"></el-input>
+                :value="dh.first('selectedAge').age"
+                placeholder="请输入年龄"></el-input>
             </span>
           </div>
           <el-table
@@ -129,7 +131,7 @@
               style="float: right;"
               @size-change="(limit) => dh.assign0('pagiListPagination', {limit})"
               @current-change="(page) => dh.assign0('pagiListPagination',{page})"
-              :current-page="currentPage"
+              :current-page="dh.first('pagiListPagination').page"
               :page-sizes="[5, 10, 20, 50]"
               :page-size="dh.first('pagiListPagination').limit"
               layout="total, sizes, prev, pager, next, jumper"
@@ -139,17 +141,31 @@
         </div>
       </el-card>
     </div>
-    <div class="row-margin-top">
+    <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>5. 全局联动</span>
         </div>
         <div >
           <p>
-                       我们在头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.<br/>
-                        这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。
+                         我们在头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.<br/>
+                         这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。<br/>
+                         在很多场景下，用DataHub可以代替Vuex、Redux管理全局状态。             
          </p>
           头部选中值：{{gDh.first('selectedProvince')}}                   
+        </div>
+      </el-card>
+    </div>
+    <div class="row-margin">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span>6. 传递给子组件</span>
+        </div>
+        <div >
+          <p>
+                           自己的DataHub实例可以作为页面级（或当前组件级）上下文传递给子组件（/vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/components/Child.vue）            
+          </p>
+          传递的值：<child :data-hub="dh"></child>  
         </div>
       </el-card>
     </div>
@@ -158,7 +174,8 @@
 
 <script>
   import {DataHub} from 'naraku';
-  import '@/styles/markdown.css';
+  
+  import Child from './components/Child.vue';
   
   export default DataHub.inject({
     // 获取省份列表
@@ -170,6 +187,11 @@
       action: 'getCity',
       dependence: 'selectedProvince' // 依赖选中的省，可以用数据表示多重依赖
     },
+    // 选中的城市
+    selectedCity: {
+      // 当城市列表发生变化时，清空选中的城市
+      clear: 'city',
+    },
     // 带分页的数据
     pagiList:{
       action: 'getPagiData',
@@ -177,7 +199,7 @@
       filter: ['selectedSex', 'selectedAge'], 
       pagination: true, // 设置为分页数据，会自动创建分页数据集，名称为XXXPagination
     },
-    // 自动创建的分页数据集
+    // 自动创建的分页数据集，设定一下初始数据
     pagiListPagination: {
       // default是默认的初始数据
       default : {
@@ -201,33 +223,22 @@
           name: '不限'
         }
       ]
+    },
+    // 传递给子组件的数据
+    childData: {
+      default: [{
+        value: 123456
+      }]
     }
   })({
-    props: {
-    },
-    data() {
-     return {
-       selectedProvince: null,
-       selectedCity: null,
-       selectedSex: null,
-       selectedAge: 100,
-       currentPage: 1,
-     };
-    },
-    created() {
-      
-    },
-    methods: {
-    }
-    
+    components: {Child} // 子组件
+    // 啥逻辑都不用写！
   });
-  
   
 </script>
 
 <style lang="scss" scoped>
   .page{
     margin-top: 12px;
-
   }
 </style>

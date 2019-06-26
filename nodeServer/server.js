@@ -5,6 +5,7 @@ var querystring = require('querystring');
 var https = require('https');
 var util = require('util');
 var httpProxy = require('http-proxy');
+var path = require('path');
 
 var express = require('express');
 var app = express();  
@@ -18,13 +19,19 @@ app.all('*', function(req, res, next) {
   next();
 });
 app.use(express.static('static'));
+app.use(express.static('serviceWorker'));
 
 app.get('/api/*', function (req, res) {  
 
     var urlInfo = url.parse(req.url);
     
     var [servicePath, methodPath] = urlInfo.pathname.replace('/api/', '').split('/');
-    var service = require('./service/' + servicePath);
+    var service;
+    try{
+    	service = require('./service/' + servicePath);
+    } catch(e){
+      console.log('模块' + servicePath + '不存在');
+    }
 
     if(!service || !service[methodPath]){
       res.send('{"code": 40004}'); 

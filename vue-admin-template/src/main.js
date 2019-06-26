@@ -17,6 +17,18 @@ import '@/permission' // permission control
 
 import '@/api/naraku.js'; // 引入API
 
+//if ('serviceWorker' in navigator) {
+//navigator.serviceWorker.register('/sw-test.js', {
+//  scope: '/sw/' }
+//).then(function(reg) {
+//  // registration worked
+//  console.log('Registration succeeded. Scope is ' + reg.scope);
+//}).catch(function(error) {
+//  // registration failed
+//  console.log('Registration failed with ' + error);
+//});
+//}
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

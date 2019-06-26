@@ -2,7 +2,7 @@
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
     <breadcrumb class="breadcrumb-container" />
-    <span style="display: inline-block;margin: 10px;" >
+    <span style="display: inline-block;margin: 4px 12px;" >
       <el-select  
         v-loading="dh.loading('province')"
         v-model="selectedProvince"  
@@ -72,7 +72,6 @@ DataHub.inject({
     }
   },
   created(){
-    console.log(this)
   },
   methods: {
     toggleSideBar() {

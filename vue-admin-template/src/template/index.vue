@@ -17,7 +17,10 @@
       }
     },
     data(){
-     return {} 
+     return {}; 
+    },
+    beforeDestroy() {
+      
     },
     created() {
       

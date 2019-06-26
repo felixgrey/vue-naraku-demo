@@ -72,6 +72,11 @@ export const constantRoutes = [
           component: () => import('@/views/naraku/datahub/cascade.vue'),
           meta: { title: '数据管理', icon: 'tree' }
         },
+        {
+          path: 'events',
+          component: () => import('@/views/naraku/datahub/events.vue'),
+          meta: { title: '数据、事件、状态 ', icon: 'tree' }
+        },
       ]
     }]
   },
