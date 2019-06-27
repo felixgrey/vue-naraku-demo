@@ -6822,10 +6822,10 @@ nanomatch@^1.2.1, nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-naraku@latest:
-  version "0.1.27"
-  resolved "https://registry.npm.taobao.org/naraku/download/naraku-0.1.27.tgz#62ae21a14766cb5f1d718c8c70b53f69956f61a5"
-  integrity sha1-Yq4hoUdmy18dcYyMcLU/aZVvYaU=
+naraku@^0.1.32:
+  version "0.1.32"
+  resolved "https://registry.npmjs.org/naraku/-/naraku-0.1.32.tgz#96bb798eae4a21a526adb267e0e251259d77a8b6"
+  integrity sha512-RVDRWjIodzQrtLow2J7v3vm9sGfJj6WmVbsXj1AUUfZjkLR4Mzgw5SNZ4r79w84iSlMGX8fShDDyv/0OOq+Hig==
 
 natural-compare@^1.4.0:
   version "1.4.0"
