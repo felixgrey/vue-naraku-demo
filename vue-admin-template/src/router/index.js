@@ -75,7 +75,7 @@ export const constantRoutes = [
         {
           path: 'events',
           component: () => import('@/views/naraku/datahub/events.vue'),
-          meta: { title: '数据、事件、状态 ', icon: 'tree' }
+          meta: { title: '数据操作 ', icon: 'tree' }
         },
       ]
     }]

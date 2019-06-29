@@ -19,34 +19,58 @@ app.all('*', function(req, res, next) {
   next();
 });
 app.use(express.static('static'));
-app.use(express.static('serviceWorker'));
+
+function doService(servicePath, methodPath, data ){
+  var service;
+  
+  try{
+    service = require('./service/' + servicePath);
+  } catch(e){
+    console.log(e);
+  }
+  
+  if(!service || !service[methodPath]){
+    return Promise.reject({"code": 40004});
+  }
+  
+  return Promise.resolve(service[methodPath](data)); 
+}
+
+function getService(req){
+  var urlInfo = url.parse(req.url);   
+  return urlInfo.pathname.replace('/api/', '').split('/')
+    .concat(querystring.parse(urlInfo.query));
+}
 
 app.get('/api/*', function (req, res) {  
 
-    var urlInfo = url.parse(req.url);
-    
-    var [servicePath, methodPath] = urlInfo.pathname.replace('/api/', '').split('/');
-    var service;
-    try{
-    	service = require('./service/' + servicePath);
-    } catch(e){
-      console.log('模块' + servicePath + '不存在');
-    }
-
-    if(!service || !service[methodPath]){
-      res.send('{"code": 40004}'); 
-      return;
-    }
-    
-    Promise.resolve(service[methodPath](querystring.parse(urlInfo.query))).then((data) => {
-      res.send(JSON.stringify({code: 20000, data}, null, 2)); 
-    });
-
+  var [servicePath, methodPath, queryData] = getService(req);
+  
+  doService(servicePath, methodPath, queryData)
+  .then(data => res.send(JSON.stringify({code: 20000, data})))
+  .catch(err => res.send(JSON.stringify(err)));
 });  
+
+app.post('/api/*', function (req, res) {  
+
+  var post = '';     
+
+  req.on('data', function(chunk){    
+      post += chunk;
+  });
+
+  req.on('end', function(){    
+    var [servicePath, methodPath] = getService(req);
+    
+    doService(servicePath, methodPath, JSON.parse(post))
+    .then(data => res.send(JSON.stringify({code: 20000, data})))
+    .catch(err => res.send(JSON.stringify(err)));
+  });
+});
 
 var server = app.listen(7000, function () {  
     var host = server.address().address;  
     var port = server.address().port;  
   
-    console.log('Example app listening at http://%s:%s', host, port);  
+    console.log(`listening at http://${host}:${port}`);  
 });  

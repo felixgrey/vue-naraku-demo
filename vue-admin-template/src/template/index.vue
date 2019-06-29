@@ -1,6 +1,17 @@
 <template>
   <div class="app-container page">
-    
+    <div class="row-margin">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span>1. title</span>
+        </div>
+        <div>
+          <p>
+            
+          </p>
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 

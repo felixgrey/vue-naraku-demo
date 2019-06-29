@@ -9,28 +9,29 @@
           <div>
             我的数据：{{pDh && pDh.first(source)}}
           </div>
-          <div>
-            我被呼叫的次数：{{callCount}}
-          </div>
-          <div>
-            我被呼叫的信息：
-          </div>
-          <div style="margin-left: 12px;">
-            {{callInfo}}
-          </div>
-          <div>
-            我要回复的信息：<el-input style="margin-top: 4px;" 
-              type="textarea"
-              v-model="replyInfo" placeholder="请输入内容">             
-            </el-input>
-          </div>
-          <div style="margin-top: 8px; height: 16px;">
-            <el-button 
-              @click="submit"
-              style="margin-right: 8px;float: right;" type="primary" round size="mini">发送</el-button>
-          </div>
+          <template v-if="callAble" >
+               <div>
+              我被呼叫的次数：{{callCount}}
+            </div>
+            <div>
+              我被呼叫的信息：
+            </div>
+            <div style="margin-left: 12px;">
+              {{callInfo}}
+            </div>
+            <div>
+              我要回复的信息：<el-input style="margin-top: 4px;" 
+                type="textarea"
+                v-model="replyInfo" placeholder="请输入内容">             
+              </el-input>
+            </div>
+            <div style="margin-top: 8px; height: 16px;">
+              <el-button 
+                @click="submit"
+                style="margin-right: 8px;float: right;" type="primary" round size="mini">发送</el-button>
+            </div>
+          </template>
         </div>
-          
       </el-alert>
   </div>
 </template>
@@ -55,6 +56,10 @@
         type: String,
         default: 'childData'
       },
+      callAble: {
+        type: Boolean,
+        default: false
+      }
     },
     data() {
       return {
@@ -102,21 +107,35 @@
           this.callCount++;
           this.callInfo = callInfo;
           this.replyInfo = '';
+          
+          // 如果没回复之前的信息，不再等待回复提交
+          this.offOnce && this.offOnce();
 
           return new Promise((resolve) => {
             // 这里也可以用vue的watch实现，DataHub内置支持一次性监听，使用更方便
-            this.pDhController.once(this.replyName, ([data]) => resolve(data));
-          })
+            this.offOnce = this.pDhController.once(this.replyName, ([data]) => resolve(data));
+          });
         });
 
-        // 广播通信（不常用）：注册一个不包含名字的事件
-        this.pDhController.on('callChild', (callInfo = '', callback) => {
+        // 广播通信（不常用）：注册一个事件
+        this.pDhController.on('你是谁？', (callback) => {
           this.callCount++;
-          this.callInfo = callInfo;
-          this.replyInfo = '';
+          this.callInfo = '询问名字';
+          const replyInfo = this.replyInfo = '我是' + this.name;
 
           // 如果参数是回调函数，则回复信息
-          (typeof callback === 'function') && this.pDhController.once(this.replyName, ([data]) => callback(data));
+          if (typeof callback === 'function') {
+            if(/ie/ig.test(this.name)) {
+              // IE长延迟回复 @_@！
+              setTimeout(() => {
+                callback(replyInfo)
+              }, 1500);
+            } else {
+              setTimeout(() => {
+                callback(replyInfo)
+              }, 100);
+            }
+          }
         });
       }
     },

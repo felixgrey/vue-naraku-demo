@@ -37,3 +37,7 @@ exports.getPagiData = function(param = {}){
   
   return filterData;
 }
+
+exports.save(data = {}) {
+  return '提交的数据是：' + JSON.stringify(data, null, 2);
+}

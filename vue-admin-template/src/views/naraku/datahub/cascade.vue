@@ -3,6 +3,18 @@
     <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
+          <span>0. 本页说明</span>
+        </div>
+        <div>
+          <p>
+                          本页代码 /vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/cascade.vue
+         </p>
+        </div>
+      </el-card>
+    </div>
+    <div class="row-margin">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
           <span>1. 请求接口</span>
         </div>
         <div >
@@ -13,11 +25,7 @@
           <p>
                     在本项目中，请求接口在/vue-naraku-demo/vue-admin-template/src/api/naraku.js做统一管理。
                     一般情况下，通过自动生成的接口文件即可满足需求，无需额外配置。
-          </p>
-         <p>
-           具体应用案例参考本页代码 /vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/cascade.vue
-         </p>
-                      
+          </p>         
         </div>
       </el-card>
     </div>
@@ -51,11 +59,13 @@
         <div >
           <p>DataHub最常见用法就是数据联动，这里以省市数据联动为例，当选择A、B、C省时，可以明显看到loading效果。</p>
           <p>通过DataHub组件，可以方便的实现任意组件任意层级之间的联动，只需简单的添加几行声明语句即可。</p>
-          <p> 当选中的省份清空时，由于不满足依赖条件，城市列表也清空。</p>
-          <p> 在很多情况下，不使用v-model指令，而是使用:value直接绑定到DataHub数据集更方便。</p>
+          <p>当选中的省份清空时，由于不满足依赖条件，城市列表也清空。</p>
+          <p>当子层级检索数据时，父层级的值处于锁定状态，值不可修改</p>
+          <p>在很多情况下，select不使用v-model指令，而是使用:value直接绑定到DataHub数据集更方便。</p>
           <div>
             <el-select  
               clearable
+              :disabled="dh.status('selectedProvince') === 'locked'"
               v-loading="dh.loading('province')"
               :value="dh.first('selectedProvince').value"  
               @change="value => {value ? dh.set('selectedProvince', {value}) : dh.set('selectedProvince',[]) }" 
@@ -108,9 +118,9 @@
             年龄
             <span>
               <el-input 
+                v-model="dh.first('selectedAge').age"
                 @change="age => dh.set('selectedAge', {age})"
-                :value="dh.first('selectedAge').age"
-                placeholder="请输入年龄"></el-input>
+                placeholder="请输入内容"></el-input>
             </span>
           </div>
           <el-table
@@ -163,7 +173,13 @@
           <p>
                            自己的DataHub实例可以作为页面级（或当前组件级）上下文传递给子组件（/vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/components/Child.vue）            
           </p>
-          传递的值：<child :data-hub="dh"></child>  
+          <div style="margin-left: 24px;">
+            <el-input 
+              v-model="dh.first('childData').value"
+              @change="value => dh.set('selectedAge', {value})"
+              placeholder="请输入内容"></el-input>
+          </div> 
+          <child :data-hub="dh"></child>  
         </div>
       </el-card>
     </div>
@@ -196,6 +212,9 @@
       // 检索用的过滤条件，支持多个过滤条件，依赖也一样可用多个。
       filter: ['selectedSex', 'selectedAge'], 
       pagination: true, // 设置为分页数据，会自动创建分页数据集，名称为XXXPagination
+    },
+    selectedAge:{
+      default:{}
     },
     // 自动创建的分页数据集，设定一下初始数据
     pagiListPagination: {

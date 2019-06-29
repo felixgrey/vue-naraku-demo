@@ -7,7 +7,7 @@
         </div>
         <div>
           <p>
-            本页代码：(/vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/events.vue)
+            本页代码：/vue-naraku-demo/vue-admin-template/src/views/naraku/datahub/events.vue
           </p>
           <p>
             本页采用了声明语法糖
@@ -82,15 +82,112 @@
         </div>
       </el-card>
     </div>
+    <div class="row-margin">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span>2. set、status、emit</span>
+        </div>
+        <div>
+          <p style="line-height: 24px;">
+            set数据时会触发几个事件：<br/>
+            1. $dataChange事件，同时触发同名事件<br/>
+            2. 如果status发生变化，会触发$statusChange事件，同时触发$statusChange:XXX（名称）事件<br/>
+            3. 状态包括：undefined、loading、locked、set、error<br/>
+            4. delete操作也会触发相关事件（delete方法与js操作符冲突，vue模板编译失败，提供别名deleteData）<br/>
+            5. 可以通过emit方法手动触发事件，自定义的事件名称不要和数据集名称相同，以免冲突。
+          </p>
+          <div>
+            <p>
+              示例：监听someData数据集的$dataChange、someData、$statusChange、$statusChange:set、customEvent事件
+            </p>
+            <el-switch active-text="监听" inactive-text="取消" v-model="listenData"></el-switch>
+            <el-button style="margin-left: 16px;" @click="() => dh.deleteData('someData')">dh.deleteData('someData')</el-button>
+            <el-button @click="() => dh.set('someData',{})">dh.set('someData',{})</el-button>
+            <el-button @click="() => dh.emit('customEvent',{})">dh.emit('customEvent',{})</el-button>
+          </div>
+        </div>
+      </el-card>
+    </div>
+    <div class="row-margin">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span>3. fetch</span>
+        </div>
+        <div>
+          <p>
+            fetch方法绕过了DataHub数据集定义，直接获取数据，一般用于获取某条数据详情信息或临时数据等不适合定义数据集的场景
+          </p>
+          <el-button @click="getCity">getCity</el-button>
+        </div>
+      </el-card>
+    </div>
+    <div class="row-margin">
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span>4. submit、refresh</span>
+        </div>
+        <div>
+          <p>
+            submit用于提交表单，同时提供锁定数据、刷新数据功能
+          </p>
+          <p>
+            提交历史：<el-button  @click="clearHistory">清空历史</el-button>
+            <pre>
+              <code>
+{{JSON.stringify(dh.get('submitHistory'), null, 2)}}
+              </code>
+            </pre>
+          </p>
+          <p>
+            childData状态： {{dh.status('childData')}}
+          </p>
+          <el-card class="box-card" style="width: 300px;">
+            <el-form 
+                v-loading="dh.loading('form')"
+               :model="formData" label-width="80px">
+              <el-form-item label="用户名称">
+                 <el-input v-model="formData.name"></el-input>
+              </el-form-item>
+              <el-form-item label="用户名称">
+                 <el-input v-model="formData.password"></el-input>
+              </el-form-item>
+              <el-switch active-text="数据集" inactive-text="单条数据" v-model="submitList"></el-switch>
+               <el-button type="primary" @click="submitForm">提交</el-button>
+            </el-form>
+          </el-card>
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script>
   import { DataHub, Blank } from 'naraku';
   import Child from './components/Child.vue';
+  import { Message } from 'element-ui';
 
   //习惯了React的类修饰器写法，可以采用如下的语法糖，看起来更整齐
   export default @DataHub.inject({
+    // 获取提交历史
+    submitHistory: {
+      action: 'getSubmitHistory'
+    },
+    // 用来提交的数据集
+    form: {
+      // form = true的时候不会自动请求action
+      action: 'save',
+      // 设置属性form = true，表示是用来提交的
+      form: true,
+      // 小技巧：提交的参数可以通过定义依赖/过滤的方式配置
+      filter: 'formConfig'
+    },
+    clearHistory:{
+      action: 'clearHistory',
+    },
+    // 提交配置
+    formConfig:{
+      default: {list: false}
+    },
     // 传递给子组件的数据
     childData: {
       default: [{
@@ -104,6 +201,9 @@
     vue = {
       components: {Child},
       watch: {
+        submitList: function(list){
+          this.dh.set('formConfig',{list})
+        },
         listenWhen: function(flag){
           if (flag) {
             this.whenOn();
@@ -132,6 +232,13 @@
             this.onceOff();
           }
         },
+        listenData: function(flag){
+          if (flag) {
+            this.dataChangeOn();
+          } else {
+            this.dataChangeOff();
+          }
+        },
       },
       data() {
         return {
@@ -139,15 +246,62 @@
           listenAll: false,
           listenOn: false,
           listenOnce: false,
+          listenData: false,
+          submitList: false,
           
           changeCount: 0,
           whenValue: '--',
           allValue: '--',
           onValue: '--',
           onceValue: '--',
+          offList: [],
+          
+          eventList: [
+          '$dataChange', 'someData', 'customEvent',
+          '$statusChange', '$statusChange:someData',
+          '$delete:someData',
+          ],
+          
+          formData: {name: 'admin', password: '123456'}
         }
       },
+      created(){
+
+      },
       methods: {
+        submitForm(){
+          // 提交form数据集
+          this.dh.submit('form', {
+            // 要提交的数据，会自动打包成数组
+            data: this.formData,
+            // 在提交过程中，需要锁定的数据集，通常是查询条件
+            lock: 'childData',
+            // 提交成功后，需要刷新的数据，通常是数据列表
+            refresh: 'submitHistory'
+          }).then((data) => {
+            // 提交成功后返回的数据
+            Message({
+              message: JSON.stringify(data, null, 2),
+              type: 'info',
+              duration: 5 * 1000
+            });
+          })
+        },
+        clearHistory(){
+          this.dh.submit('clearHistory').then(()=>{
+            // 也可以这样手动刷新
+            this.dh.refresh('submitHistory');
+          });
+        },
+        getCity(){
+          this.dhController.fetch('getCity', {value: 210000}).then(data => {
+            Message({
+                message: JSON.stringify(data, null, 2),
+                type: 'info',
+                duration: 5 * 1000
+              });
+          })
+        },
         deleteData(){
           this.changeCount = 0;
           this.whenValue = '--';
@@ -156,6 +310,33 @@
           this.onceValue = '--';
           this.dh.delete('testData1');
           this.dh.delete('testData2');
+        },
+        
+        dataChangeOn(){
+          let msgIndex = 0;
+        
+          this.eventList.forEach((name) => {
+            let off = this.dhController.on(name, () => {
+              // 因为Message一次只能弹出一个，而事件是同时触发的，这里加上计数器和延时，分别弹出
+              setTimeout(() => {
+                Message({
+                  message: `触发${name}事件`,
+                  type: 'info',
+                  duration: 5 * 1000
+                });
+                msgIndex --;
+              }, 100 * (msgIndex++));
+              
+              console.log(`触发${name}事件`);
+            });
+            
+            this.offList.push(off);
+          });
+        },
+        
+        dataChangeOff() {
+          this.offList.forEach(off => off());
+          this.offList = [];
         },
         
         whenOn(){
