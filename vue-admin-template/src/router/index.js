@@ -47,7 +47,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/naraku/datahub/cascade',
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
@@ -76,6 +76,11 @@ export const constantRoutes = [
           path: 'events',
           component: () => import('@/views/naraku/datahub/events.vue'),
           meta: { title: '数据操作 ', icon: 'tree' }
+        },
+        {
+          path: 'message',
+          component: () => import('@/views/naraku/datahub/message.vue'),
+          meta: { title: '组件通信 ', icon: 'tree' }
         },
       ]
     }]

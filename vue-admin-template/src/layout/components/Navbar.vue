@@ -5,8 +5,8 @@
     <span style="display: inline-block;margin: 4px 12px;" >
       <el-select  
         v-loading="dh.loading('province')"
-        v-model="selectedProvince"  
-        @change="(value) => gDh.set('selectedProvince', {value})" placeholder="请选择">
+        v-model="currentProvince"  
+        placeholder="请选择">
         <el-option
           v-for="item in dh.get('province')"
           :key="item.value"
@@ -66,9 +66,14 @@ DataHub.inject({
       'avatar'
     ])
   },
+  watch:{
+    currentProvince: function(value) {
+      this.gDh.set('currentProvince', {value});
+    }
+  },
   data(){
     return {
-      selectedProvince: null
+      currentProvince: null
     }
   },
   created(){

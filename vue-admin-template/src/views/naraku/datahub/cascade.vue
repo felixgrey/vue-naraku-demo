@@ -154,13 +154,14 @@
     <div class="row-margin">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <span>5. 全局联动</span>
+          <span>5. 全局联动、link</span>
         </div>
         <div >
-          <p>我们在头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.</p>
-          <p> 这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。</p>
-          <p>在很多场景下，用DataHub可以代替Vuex、Redux管理全局状态。</p>             
-          头部选中值：{{gDh.first('selectedProvince')}}                   
+          <p>头部（/vue-naraku-demo/vue-admin-template/src/layout/components/Navbar.vue）定义了一个选择省份的组件.</p>
+          <p>这个组件的值是保存在全局的DataHub里，因此任何页面任何组件都可以访问。</p>
+          <p>在很多场景下，用DataHub可以代替Vuex、Redux管理全局状态。</p>    
+          <p>link方法可以用来同步全局DataHub的数据</p>
+          头部选中值：{{gDh.first('currentProvince')}}同步值：{{dh.first('currentProvince')}}
         </div>
       </el-card>
     </div>
@@ -248,8 +249,13 @@
       }]
     }
   })({
-    components: {Child} // 子组件
-    // 啥逻辑都不用写！
+    components: {
+      Child
+    },
+    created(){
+      // link数据
+      this.dhController.link('currentProvince', this.gDh);
+    }
   });
   
 </script>

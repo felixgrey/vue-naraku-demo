@@ -80,6 +80,7 @@
       // 表单、过滤条件的提交也可以这么做
       submit() {
         this.pDh && this.pDh.set(this.replyName, this.replyInfo);
+        this.replyInfo = '';
       }
     },
     created() {
@@ -103,7 +104,7 @@
         // console.log(this.pDh === this.dataHub); // true
         
         // 组件通信（常用）：注册一个方法，通过name属性做唯一标识
-        this.pDhController.register('callChild:' + name, (callInfo = '') => {
+        this.pDhController.register('callChild:' + this.name, (callInfo = '') => {
           this.callCount++;
           this.callInfo = callInfo;
           this.replyInfo = '';
@@ -120,20 +121,20 @@
         // 广播通信（不常用）：注册一个事件
         this.pDhController.on('你是谁？', (callback) => {
           this.callCount++;
-          this.callInfo = '询问名字';
-          const replyInfo = this.replyInfo = '我是' + this.name;
+          this.callInfo = '你是谁？';
+          this.replyInfo = '';
 
           // 如果参数是回调函数，则回复信息
           if (typeof callback === 'function') {
             if(/ie/ig.test(this.name)) {
               // IE长延迟回复 @_@！
               setTimeout(() => {
-                callback(replyInfo)
-              }, 1500);
+                callback( '我是' + this.name)
+              }, 2000);
             } else {
               setTimeout(() => {
-                callback(replyInfo)
-              }, 100);
+                callback('我是' + this.name)
+              }, 200);
             }
           }
         });
