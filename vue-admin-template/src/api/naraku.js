@@ -26,7 +26,9 @@ function addFetcher(type, url, method = 'get') {
     let submitData = form ? data : param; // 通常情况下，form提交的是数据，其他时候提交的是请求参数
     
     // 提交一条数据还是整个数据集
-    submitData = param.list ? submitData : submitData[0];
+    if (form) {
+      submitData = param.list ? submitData : submitData[0];
+    }
     
     return request({
       url: paramToQuery(url, method ==='post' ? {} : submitData),
