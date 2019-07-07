@@ -45,7 +45,7 @@
   })({
     /* Vue 组件定义内容*/  
   })                      
-            </code>
+              </code>
             </pre>
           </p>
         </div>
@@ -103,6 +103,23 @@
           <p>根本区别在于依赖是强制的，当依赖条件不满足时，数据集清空，过滤是可选的，为空时不做过滤，正常查询。   </p>
           <p>过滤条件通过可以通过dataHub.assign0方法快速和已有数据的第一条merge。</p>
           <p>本例当触发change事件时直接执行了set方法，所以立即执行请求，也可以将过滤条件保存在本地，当点击查询按钮时执行set。</p>
+          <p>
+            使用默认配置时，不需要手动设定pagination数据集
+            <pre>
+              <code>
+    DataHub.pagination = {
+      data: 'data', // 当启动分页时，保存数据信息的字段
+      total: 'total' // 当启动分页时，保存数据总数的字段
+    };
+    
+    DataHub.paginationData = {
+      page: 1, // 第一页
+      limit: 10, //每页10条
+      total: 0, //数据总数0
+    }
+              </code>
+            </pre>
+          </p>
           <div>性别
             <el-select  
               v-loading="dh.loading('sexList')"
@@ -217,14 +234,14 @@
     selectedAge:{
       default:{}
     },
-    // 自动创建的分页数据集，设定一下初始数据
-    pagiListPagination: {
-      // default是默认的初始数据
-      default : {
-        page: 1, // 默认第一页
-        limit: 5 // 默认每页条数
-      }
-    },
+    // 自动创建的分页数据集
+//  pagiListPagination: {
+//    // default是默认的初始数据
+//    default : {
+//      page: 1, // 默认第一页
+//      limit: 5 // 默认每页条数
+//    }
+//  },
     // 性别列表，作为静态数据
     sexList:{
       default: [
